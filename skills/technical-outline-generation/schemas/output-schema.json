@@ -1,13 +1,11 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "TechnicalOutlineGenerationOutput",
+  "title": "TechnicalOutlineGenerationOutputCompatible",
+  "description": "兼容当前 TechnicalOutlinePromptBuilder.java 的技术卷大纲输出结构。当前生产输出只允许 documentTitle 与 chapters，不包含 structureStrategy、coverageMatrix、warnings、basis、evidenceRefs 等增强字段。",
   "type": "object",
   "required": [
     "documentTitle",
-    "structureStrategy",
-    "chapters",
-    "coverageMatrix",
-    "warnings"
+    "chapters"
   ],
   "additionalProperties": false,
   "properties": {
@@ -15,47 +13,10 @@
       "type": "string",
       "minLength": 1
     },
-    "structureStrategy": {
-      "type": "object",
-      "required": [
-        "type",
-        "reason"
-      ],
-      "additionalProperties": false,
-      "properties": {
-        "type": {
-          "type": "string",
-          "enum": [
-            "score_driven",
-            "total_sub_total",
-            "process_driven",
-            "module_driven",
-            "hybrid",
-            "unknown"
-          ]
-        },
-        "reason": {
-          "type": "string",
-          "minLength": 1
-        }
-      }
-    },
     "chapters": {
       "type": "array",
       "items": {
         "$ref": "#/$defs/chapter"
-      }
-    },
-    "coverageMatrix": {
-      "type": "array",
-      "items": {
-        "$ref": "#/$defs/coverageItem"
-      }
-    },
-    "warnings": {
-      "type": "array",
-      "items": {
-        "type": "string"
       }
     }
   },
@@ -65,10 +26,7 @@
       "required": [
         "id",
         "title",
-        "expanded",
-        "sortNo",
-        "basis",
-        "evidenceRefs"
+        "sortNo"
       ],
       "additionalProperties": false,
       "properties": {
@@ -87,87 +45,12 @@
           "type": "integer",
           "minimum": 1
         },
-        "basis": {
-          "type": "string"
-        },
-        "evidenceRefs": {
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/evidenceRef"
-          }
-        },
         "children": {
           "type": "array",
           "items": {
             "$ref": "#/$defs/chapter"
           },
           "default": []
-        }
-      }
-    },
-    "evidenceRef": {
-      "type": "object",
-      "required": [
-        "type",
-        "chunkId",
-        "reason"
-      ],
-      "additionalProperties": false,
-      "properties": {
-        "type": {
-          "type": "string",
-          "enum": [
-            "scoring",
-            "requirement",
-            "format",
-            "inferred"
-          ]
-        },
-        "chunkId": {
-          "type": "string"
-        },
-        "reason": {
-          "type": "string"
-        }
-      }
-    },
-    "coverageItem": {
-      "type": "object",
-      "required": [
-        "scoringItem",
-        "maxScore",
-        "coveredBy",
-        "coverageStatus",
-        "reason"
-      ],
-      "additionalProperties": false,
-      "properties": {
-        "scoringItem": {
-          "type": "string",
-          "minLength": 1
-        },
-        "maxScore": {
-          "type": [
-            "number",
-            "null"
-          ]
-        },
-        "coveredBy": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "coverageStatus": {
-          "type": "string",
-          "enum": [
-            "covered",
-            "partially_covered",
-            "not_covered"
-          ]
-        },
-        "reason": {
-          "type": "string"
         }
       }
     }
