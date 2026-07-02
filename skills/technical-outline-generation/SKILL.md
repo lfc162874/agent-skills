@@ -1,8 +1,9 @@
 ---
 name: technical-outline-generation
-description: 根据招标文件评分标准、技术/采购需求和格式要求，反向推导投标文件技术卷大纲。适用于技术卷目录生成、评分项覆盖分析、正文生成前置大纲规划。
-version: 1.0.0
+description: 根据招标文件评分标准、技术/采购需求和格式要求，反向推导投标文件技术卷大纲。当前版本默认兼容 TechnicalOutlinePromptBuilder.java 的生产输出结构。
+version: 1.0.1
 language: zh-CN
+compatibility: TechnicalOutlinePromptBuilder.java
 ---
 
 # 技术卷大纲生成 Skill
@@ -16,8 +17,7 @@ language: zh-CN
 1. 根据评分标准反向推导技术卷大纲；
 2. 根据采购需求和技术要求补充章节内容；
 3. 自动选择总分总、流程型、模块型、评分项驱动型或混合型结构；
-4. 输出评分项覆盖矩阵；
-5. 为后续正文生成提供章节依据。
+4. 生成可用于后续正文生成的技术卷章节树。
 
 本 Skill 不用于：
 
@@ -26,6 +26,25 @@ language: zh-CN
 3. 报价文件目录生成；
 4. 简单抽取招标文件原目录；
 5. 无证据的通用技术方案模板生成。
+
+## 兼容性要求
+
+当前版本必须兼容现有 `TechnicalOutlinePromptBuilder.java` 的输出结构。
+
+默认输出只能包含：
+
+1. `documentTitle`；
+2. `chapters`。
+
+默认不得输出以下增强字段：
+
+1. `structureStrategy`；
+2. `coverageMatrix`；
+3. `warnings`；
+4. `basis`；
+5. `evidenceRefs`。
+
+如后续 Java DTO、前端树结构和数据库字段已升级，才允许启用增强输出。启用增强输出前，必须同步更新 `schemas/output-schema.json` 和后端解析逻辑。
 
 ## 核心原则
 
@@ -36,11 +55,38 @@ language: zh-CN
 5. 格式/目录参考只用于判断技术卷格式约束；
 6. 不得将商务卷、资格卷、报价文件内容混入技术卷；
 7. 输出必须是可解析 JSON；
-8. 输出必须包含章节树、结构策略、评分项覆盖矩阵和风险提醒。
+8. 输出必须严格符合 `schemas/output-schema.json`。
 
 ## 输入要求
 
-调用本 Skill 时，应提供以下 JSON 输入：
+调用本 Skill 时，建议提供以下输入上下文。
+
+如果沿用当前 Java 代码，可继续使用现有 PromptBuilder 方式拼接：
+
+```text
+【生成配置】
+chapterDepth=3, bidType=technical, outlineStyle=formal
+
+【评分标准证据】
+- 评分项文本
+
+【评分标准原文片段】
+- chunkId=xxx, titlePath=xxx
+原文内容
+
+【技术/采购需求结构化证据】
+- 需求项文本
+
+【技术/采购需求原文片段】
+- chunkId=xxx, titlePath=xxx
+原文内容
+
+【格式/目录参考证据】
+- chunkId=xxx, titlePath=xxx
+原文内容
+```
+
+如果系统已改造为 Skill Input JSON，可使用以下结构作为输入，但该结构只是输入，不代表输出也包含这些字段：
 
 ```json
 {
@@ -70,14 +116,13 @@ language: zh-CN
 1. 读取 `docs/execution-rules.md`；
 2. 解析评分标准，识别得分点、高分项、核心项；
 3. 读取 `docs/structure-strategies.md`；
-4. 根据评分标准和采购需求选择结构策略；
+4. 根据评分标准和采购需求选择结构策略，但不要把结构策略字段输出到最终 JSON；
 5. 读取 `docs/forbidden-content.md`；
 6. 排除商务卷、资格卷、报价文件内容；
 7. 生成技术卷章节树；
-8. 建立评分项覆盖矩阵；
-9. 根据 `schemas/output-schema.json` 输出 JSON；
-10. 根据 `validators/quality-checklist.md` 自检；
-11. 只输出最终 JSON，不输出 Markdown、解释、分析过程。
+8. 根据 `schemas/output-schema.json` 输出兼容当前代码的 JSON；
+9. 根据 `validators/quality-checklist.md` 自检；
+10. 只输出最终 JSON，不输出 Markdown、解释、分析过程。
 
 ## 输出要求
 
@@ -89,11 +134,43 @@ language: zh-CN
 2. 解释文字；
 3. 推导过程；
 4. 多余前缀；
-5. 多余后缀。
+5. 多余后缀；
+6. 当前代码不支持的增强字段。
 
 输出必须符合：
 
 - `schemas/output-schema.json`
+
+## 当前兼容输出示例
+
+```json
+{
+  "documentTitle": "项目名称技术卷大纲",
+  "chapters": [
+    {
+      "id": "ch-1",
+      "title": "一、一级章节标题",
+      "expanded": true,
+      "sortNo": 1,
+      "children": [
+        {
+          "id": "s-1-1",
+          "title": "1.1 二级章节标题",
+          "expanded": false,
+          "sortNo": 1,
+          "children": [
+            {
+              "id": "t-1-1-1",
+              "title": "1.1.1 三级章节标题",
+              "sortNo": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+```
 
 ## 必须参考的 Skill 文件
 
