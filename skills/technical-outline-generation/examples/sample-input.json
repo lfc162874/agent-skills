@@ -1,0 +1,74 @@
+{
+  "projectName": "小舢大模型平台建设项目",
+  "generationConfig": {
+    "chapterDepth": 3,
+    "bidType": "technical",
+    "outlineStyle": "formal",
+    "structureStrategy": "auto",
+    "scoreCoverageFirst": true,
+    "maxFirstLevelChapters": 10,
+    "maxSecondLevelChapters": 6,
+    "maxThirdLevelChapters": 4
+  },
+  "scoringItems": [
+    {
+      "itemKey": "score-001",
+      "itemName": "技术方案",
+      "criteriaText": "根据投标人提供的总体技术方案完整性、合理性、先进性进行评分。",
+      "maxScore": 20,
+      "scoreWeight": 0.25,
+      "confidence": 0.95,
+      "evidenceRefs": [
+        "chunk-score-001"
+      ]
+    },
+    {
+      "itemKey": "score-002",
+      "itemName": "实施方案",
+      "criteriaText": "根据项目实施计划、进度安排、人员分工、交付保障措施进行评分。",
+      "maxScore": 15,
+      "scoreWeight": 0.18,
+      "confidence": 0.93,
+      "evidenceRefs": [
+        "chunk-score-002"
+      ]
+    }
+  ],
+  "scoringChunks": [
+    {
+      "chunkId": "chunk-score-001",
+      "titlePath": "评标办法/技术评分/技术方案",
+      "content": "技术方案：根据投标人提供的总体技术方案完整性、合理性、先进性进行评分，最高20分。",
+      "pageIndex": 18,
+      "sourceMeta": {}
+    },
+    {
+      "chunkId": "chunk-score-002",
+      "titlePath": "评标办法/技术评分/实施方案",
+      "content": "实施方案：根据项目实施计划、进度安排、人员分工、交付保障措施进行评分，最高15分。",
+      "pageIndex": 19,
+      "sourceMeta": {}
+    }
+  ],
+  "technicalRequirementItems": [
+    {
+      "itemKey": "req-001",
+      "itemName": "平台功能模块",
+      "requirementText": "建设模型中心、知识库中心、权限中心、智能审查中心、文档导出中心。",
+      "requirementType": "function",
+      "evidenceRefs": [
+        "chunk-req-001"
+      ]
+    }
+  ],
+  "technicalRequirementChunks": [
+    {
+      "chunkId": "chunk-req-001",
+      "titlePath": "采购需求/建设内容",
+      "content": "本项目需建设模型中心、知识库中心、权限中心、智能审查中心、文档导出中心。",
+      "pageIndex": 24,
+      "sourceMeta": {}
+    }
+  ],
+  "formatReferenceChunks": []
+}
