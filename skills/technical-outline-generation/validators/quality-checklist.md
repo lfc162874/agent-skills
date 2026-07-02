@@ -13,32 +13,24 @@
 5. 可被 JSON parser 正常解析；
 6. 符合 `schemas/output-schema.json`。
 
-## 2. 必填字段校验
+## 2. 当前兼容模式必填字段校验
 
-必须包含：
+当前版本默认兼容 `TechnicalOutlinePromptBuilder.java`，必须包含：
 
 1. `documentTitle`；
-2. `structureStrategy`；
-3. `chapters`；
-4. `coverageMatrix`；
-5. `warnings`。
+2. `chapters`。
 
-## 3. 结构策略校验
+当前兼容模式下不得输出以下字段：
 
-`structureStrategy.type` 只能是：
+1. `structureStrategy`；
+2. `coverageMatrix`；
+3. `warnings`；
+4. `basis`；
+5. `evidenceRefs`。
 
-1. `score_driven`；
-2. `total_sub_total`；
-3. `process_driven`；
-4. `module_driven`；
-5. `hybrid`；
-6. `unknown`。
+这些字段属于增强模式，只有后端 DTO、前端树结构、数据库保存逻辑同步升级后才允许启用。
 
-`structureStrategy.reason` 不能为空。
-
-如果 `type = unknown`，则 `warnings` 必须说明原因。
-
-## 4. 章节层级校验
+## 3. 章节层级校验
 
 必须满足 `generationConfig.chapterDepth`：
 
@@ -47,7 +39,7 @@
 3. `chapterDepth = 3`：可以出现三级章节；
 4. 不得超过配置深度。
 
-## 5. 编号格式校验
+## 4. 编号格式校验
 
 建议满足：
 
@@ -56,34 +48,41 @@
 3. 三级章节标题以数字编号开头，例如：`1.1.1`、`1.1.2`；
 4. `sortNo` 应与章节顺序一致。
 
+## 5. 章节字段校验
+
+当前兼容模式下，章节节点只允许包含以下字段：
+
+1. `id`；
+2. `title`；
+3. `expanded`；
+4. `sortNo`；
+5. `children`。
+
+其中：
+
+1. `id`、`title`、`sortNo` 必须存在；
+2. `expanded` 可选，因为当前 Java 示例中的三级节点未强制包含该字段；
+3. `children` 可选；
+4. 不允许输出 `basis`、`evidenceRefs` 等增强字段。
+
 ## 6. 评分项覆盖校验
 
-必须检查：
+当前兼容模式不输出 `coverageMatrix`，因此评分项覆盖关系只能通过章节标题和内部推导保证。
 
-1. `coverageMatrix` 是否覆盖所有 `scoringItems`；
-2. 高分评分项是否存在 `coveredBy`；
-3. `coveredBy` 中引用的章节 id 是否真实存在；
-4. `coverageStatus` 是否合理；
-5. `not_covered` 的评分项是否写入 `warnings`；
-6. `partially_covered` 的评分项是否说明原因。
+校验时应检查：
 
-## 7. 证据引用校验
+1. 高分评分项是否体现在一级或二级章节标题中；
+2. 技术评分项是否存在明显遗漏；
+3. 采购需求中的核心模块是否被章节覆盖；
+4. 章节是否过于通用，无法看出评分项响应关系。
 
-必须检查：
-
-1. 核心一级章节 `evidenceRefs` 不应为空；
-2. 关键二级章节 `evidenceRefs` 不应为空；
-3. `evidenceRefs.type` 只能是 `scoring`、`requirement`、`format`、`inferred`；
-4. `evidenceRefs.chunkId` 应来自输入证据；
-5. `type = inferred` 时，`reason` 必须说明推导依据。
-
-## 8. 技术卷边界校验
+## 7. 技术卷边界校验
 
 章节标题不得混入商务卷、资格卷、报价文件内容。具体禁用内容以 `docs/forbidden-content.md` 为准。
 
-如招标文件明确要求某类边界内容进入技术卷，必须在 `basis` 中说明依据。
+如招标文件明确要求某类边界内容进入技术卷，必须保证其属于技术卷要求，否则不应生成。
 
-## 9. 通用模板风险校验
+## 8. 通用模板风险校验
 
 如果出现以下章节，应检查是否有证据支撑：
 
@@ -101,7 +100,7 @@
 
 没有证据支撑时，应视为低质量大纲。
 
-## 10. 可用于正文生成校验
+## 9. 可用于正文生成校验
 
 章节应满足：
 
@@ -111,18 +110,16 @@
 4. 不过细；
 5. 不过泛；
 6. 可以直接作为正文生成任务输入；
-7. `basis` 能说明章节写作方向；
-8. `evidenceRefs` 能提供正文生成依据。
+7. 一级和二级章节能看出评分标准或采购需求来源。
 
-## 11. 最终判定
+## 10. 最终判定
 
 如果满足以下条件，可判定为合格大纲：
 
 1. JSON 可解析；
 2. Schema 校验通过；
-3. 高分评分项均已覆盖；
+3. 高分评分项在一级或二级章节中基本覆盖；
 4. 无商务、资格、报价内容混入；
 5. 章节结构符合 `chapterDepth`；
-6. 章节依据基本完整；
-7. `warnings` 合理；
-8. 可支撑后续正文生成。
+6. 章节标题贴合项目实际需求；
+7. 可支撑后续正文生成。
