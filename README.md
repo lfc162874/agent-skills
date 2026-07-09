@@ -7,6 +7,7 @@
 | Skill | 说明 |
 |---|---|
 | `skills/technical-outline-generation` | 根据评分标准、技术/采购需求和格式约束，反向推导投标文件技术卷大纲 |
+| `skills/technical-volume-body-writing` | 根据技术卷大纲、评分标准、招标要求和知识库证据生成结构化技术卷正文 JSON blocks |
 
 ## Skill 目录规范
 
