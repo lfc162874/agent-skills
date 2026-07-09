@@ -63,7 +63,7 @@
             "type": "boolean"
           },
           "coverageDescription": {
-            "type": "string"
+            "$ref": "#/$defs/cleanText"
           }
         }
       }
@@ -86,7 +86,7 @@
             "type": "string"
           },
           "usedFor": {
-            "type": "string"
+            "$ref": "#/$defs/cleanText"
           }
         }
       }
@@ -121,6 +121,32 @@
     }
   },
   "$defs": {
+    "cleanText": {
+      "type": "string",
+      "minLength": 1,
+      "allOf": [
+        {
+          "not": {
+            "pattern": "^[\\s　\\t]+"
+          }
+        },
+        {
+          "not": {
+            "pattern": "\\*\\*|```|^\\s{0,3}#{1,6}\\s|^\\s*[-*+]\\s+|^\\s*>\\s+"
+          }
+        },
+        {
+          "not": {
+            "pattern": "^\\s*(\\d+(\\.\\d+)*[\\.、]?\\s+|[一二三四五六七八九十]+、|（[一二三四五六七八九十]+）|\\([一二三四五六七八九十]+\\)|第[一二三四五六七八九十]+[，、])"
+          }
+        },
+        {
+          "not": {
+            "pattern": "\\n\\s*\\n"
+          }
+        }
+      ]
+    },
     "paragraphBlock": {
       "type": "object",
       "additionalProperties": false,
@@ -134,8 +160,7 @@
           "const": "paragraph"
         },
         "text": {
-          "type": "string",
-          "minLength": 1
+          "$ref": "#/$defs/cleanText"
         },
         "styleKey": {
           "const": "body"
@@ -168,11 +193,32 @@
           "type": "array",
           "minItems": 1,
           "items": {
-            "type": "string",
-            "minLength": 1
+            "$ref": "#/$defs/cleanText"
           }
         }
-      }
+      },
+      "oneOf": [
+        {
+          "properties": {
+            "ordered": {
+              "const": true
+            },
+            "styleKey": {
+              "const": "orderedList"
+            }
+          }
+        },
+        {
+          "properties": {
+            "ordered": {
+              "const": false
+            },
+            "styleKey": {
+              "const": "unorderedList"
+            }
+          }
+        }
+      ]
     },
     "tableBlock": {
       "type": "object",
@@ -194,8 +240,7 @@
           "type": "array",
           "minItems": 1,
           "items": {
-            "type": "string",
-            "minLength": 1
+            "$ref": "#/$defs/cleanText"
           }
         },
         "rows": {
@@ -229,17 +274,59 @@
           "maximum": 4
         },
         "text": {
-          "type": "string",
-          "minLength": 1
+          "$ref": "#/$defs/cleanText"
         },
         "styleKey": {
           "enum": [
             "heading1",
             "heading2",
-            "heading3"
+            "heading3",
+            "heading4"
           ]
         }
-      }
+      },
+      "oneOf": [
+        {
+          "properties": {
+            "level": {
+              "const": 1
+            },
+            "styleKey": {
+              "const": "heading1"
+            }
+          }
+        },
+        {
+          "properties": {
+            "level": {
+              "const": 2
+            },
+            "styleKey": {
+              "const": "heading2"
+            }
+          }
+        },
+        {
+          "properties": {
+            "level": {
+              "const": 3
+            },
+            "styleKey": {
+              "const": "heading3"
+            }
+          }
+        },
+        {
+          "properties": {
+            "level": {
+              "const": 4
+            },
+            "styleKey": {
+              "const": "heading4"
+            }
+          }
+        }
+      ]
     }
   }
 }
